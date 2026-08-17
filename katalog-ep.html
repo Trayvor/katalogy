@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="sk" class="govuk-template">
+<head>
+  <meta charset="utf-8">
+  <title>Katalóg edukačných publikácií — Katalógy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0c0c">
+  <link rel="icon" sizes="48x48" href="idsk/assets/images/favicon.ico">
+  <link rel="icon" sizes="any" href="idsk/assets/images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="idsk/frontend.min.css">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body class="govuk-template__body">
+  <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+
+  <div id="app-header"></div>
+
+  <div class="govuk-width-container">
+    <div class="govuk-breadcrumbs">
+      <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+          <a class="govuk-breadcrumbs__link" href="index.html">Úvod</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+          <a class="govuk-breadcrumbs__link" href="katalog-ep.html">Katalóg edukačných publikácií</a>
+        </li>
+      </ol>
+    </div>
+
+    <main class="govuk-main-wrapper" id="main-content">
+      <h1 class="govuk-heading-l">Katalóg edukačných publikácií</h1>
+      <p class="govuk-body">
+        Katalóg schválených edukačných publikácií je stručne predstavený v tomto popise.
+        Text poskytuje len základný prehľad.<br>
+        Podrobnejší popis publikácie si môžete zobraziť kliknutím na link nižšie.
+      </p>
+      <p class="govuk-body">
+        <a class="govuk-link" href="#">Viac informácií o katalógu</a>&nbsp;&nbsp;&nbsp;
+        <a class="govuk-link" href="#">Ako pracovať s katalógom?</a>
+      </p>
+
+      <div class="app-toolbar">
+        <div class="idsk-searchbar__wrapper" role="search">
+          <input class="govuk-input" type="search" id="app-search" placeholder="Hľadať publikáciu" title="Zadajte hľadaný výraz">
+          <button class="govuk-button govuk-button__basic" aria-label="Hľadať"><span class="material-icons" aria-hidden="true">search</span></button>
+        </div>
+        <button type="button" class="govuk-button govuk-button--sec" id="app-filter-toggle" aria-expanded="true" aria-controls="app-filter-panel">
+          <span class="material-icons" aria-hidden="true">filter_list</span>&nbsp;Filter
+        </button>
+        <span class="app-toolbar__sort govuk-body-s">
+          Triediť podľa:
+          <select class="govuk-select" id="app-sort" aria-label="Triediť podľa"></select>
+        </span>
+        <span class="app-toolbar__spacer"></span>
+        <span class="govuk-body-s">Zobrazenie:</span>
+        <button type="button" class="app-view-btn" id="app-view-list" aria-label="Zobrazenie zoznam"><span class="material-icons" aria-hidden="true">view_list</span></button>
+        <button type="button" class="app-view-btn" id="app-view-cards" aria-label="Zobrazenie karty"><span class="material-icons" aria-hidden="true">view_agenda</span></button>
+        <button type="button" class="govuk-button govuk-button--sec" id="app-export">
+          Export&nbsp;<span class="material-icons" aria-hidden="true">download</span>
+        </button>
+      </div>
+
+      <div class="app-filter-panel" id="app-filter-panel">
+        <h3 class="govuk-heading-s app-filter-panel__title">Základné filtre</h3>
+        <div class="app-filters" id="app-filters"></div>
+      </div>
+
+      <p class="govuk-body-s app-count" id="app-count" aria-live="polite"></p>
+
+      <div class="app-results" id="app-results"></div>
+    </main>
+  </div>
+
+  <div id="app-footer"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/catalog.js"></script>
+  <script type="module" src="js/common.js"></script>
+  <script>
+    // Popis publikácie pre zoznam — zloží sa z dostupných polí, ak chýba `popis`
+    function epDescription(item) {
+      if (item.popis) return item.popis;
+      const parts = [];
+      if (item.verzia_vyhotovenia) parts.push('Verzia vyhotovenia: ' + item.verzia_vyhotovenia + '.');
+      if (item.vazba) parts.push('Väzba: ' + item.vazba + '.');
+      if (item.isbn_tlacena) parts.push('ISBN (tlačená): ' + item.isbn_tlacena + '.');
+      if (item.nazov_statny_jazyk) parts.push('Názov v štátnom jazyku: ' + item.nazov_statny_jazyk + '.');
+      return parts.join(' ');
+    }
+
+    initCatalog({
+      name: 'katalog-ep',
+      searchFields: ['nazov', 'nazov_statny_jazyk', 'druh', 'jazyk', 'isbn_tlacena', 'isbn_elektronicka', 'popis'],
+      filters: [
+        { key: 'druh', label: 'Druh publikácie', getValue: function (x) { return x.druh; } },
+        { key: 'jazyk', label: 'Jazyk', getValue: function (x) { return x.jazyk; } },
+        { key: 'rok', label: 'Rok vydania', getValue: function (x) { return x.rok_vydania; } },
+        { key: 'stav', label: 'Stav', getValue: function (x) { return x.verzia_posudok; } }
+      ],
+      sorts: [
+        { key: 'newest', label: 'Najnovšie', compare: function (a, b) { return (b.rok_vydania || 0) - (a.rok_vydania || 0); } },
+        { key: 'oldest', label: 'Najstaršie', compare: function (a, b) { return (a.rok_vydania || 0) - (b.rok_vydania || 0); } },
+        { key: 'name', label: 'Názov A–Z', compare: function (a, b) { return String(a.nazov).localeCompare(String(b.nazov), 'sk'); } }
+      ],
+      csvColumns: ['id', 'nazov', 'druh', 'rok_vydania', 'jazyk', 'isbn_tlacena', 'isbn_elektronicka', 'verzia_vyhotovenia', 'verzia_posudok', 'suma'],
+      renderItem: function (item, view) {
+        const autori = (item.autor || []).map(function (a) { return a.meno; }).join(', ');
+        return '<article class="app-result">' +
+          '<div class="app-result__media"><img src="idsk/assets/images/placeholder.png" alt=""></div>' +
+          '<div class="app-result__body">' +
+            '<h3 class="app-result__title"><a class="govuk-link" href="detail-ep.html?id=' + encodeURIComponent(item.id) + '">' + esc(item.nazov) + '</a></h3>' +
+            '<p class="govuk-body app-result__desc">' + esc(epDescription(item)) + '</p>' +
+            '<p class="app-meta">' +
+              metaItem('person', autori) +
+              metaItem('menu_book', item.druh) +
+              metaItem('calendar_today', item.rok_vydania) +
+            '</p>' +
+            '<p class="app-chips">' +
+              chip(item.jazyk) + chip(item.verzia_vyhotovenia) + chip(item.verzia_posudok) + demoChip(item) +
+            '</p>' +
+          '</div>' +
+        '</article>';
+      }
+    });
+  </script>
+</body>
+</html>

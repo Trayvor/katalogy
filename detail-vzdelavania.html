@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="sk" class="govuk-template">
+<head>
+  <meta charset="utf-8">
+  <title>Detail vzdelávania — Katalógy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0c0c">
+  <link rel="icon" sizes="48x48" href="idsk/assets/images/favicon.ico">
+  <link rel="icon" sizes="any" href="idsk/assets/images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="idsk/frontend.min.css">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body class="govuk-template__body">
+  <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+
+  <div id="app-header"></div>
+
+  <div class="govuk-width-container">
+    <div class="govuk-breadcrumbs">
+      <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+          <a class="govuk-breadcrumbs__link" href="index.html">Úvod</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+          <a class="govuk-breadcrumbs__link" href="katalog-vzdelavania.html">Katalóg vzdelávania v profesijnom rozvoji</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" id="app-breadcrumb-current"></li>
+      </ol>
+    </div>
+
+    <main class="govuk-main-wrapper" id="main-content">
+      <a class="govuk-link app-back-link" href="katalog-vzdelavania.html">
+        <span class="material-icons" aria-hidden="true">west</span>Späť na katalóg
+      </a>
+      <div id="app-detail"><p class="govuk-body">Načítava sa…</p></div>
+    </main>
+  </div>
+
+  <div id="app-footer"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/catalog.js"></script>
+  <script type="module" src="js/common.js"></script>
+  <script>
+    (function () {
+      const id = new URLSearchParams(location.search).get('id');
+      const el = document.getElementById('app-detail');
+
+      function row(label, value) {
+        if (value == null || value === '') return '';
+        return '<tr class="govuk-table__row">' +
+          '<th scope="row" class="govuk-table__header">' + label + '</th>' +
+          '<td class="govuk-table__cell">' + esc(value) + '</td></tr>';
+      }
+
+      loadItem('katalog-vzdelavania', id).then(function (item) {
+        if (!item) {
+          el.innerHTML = '<p class="govuk-body">Vzdelávanie sa nenašlo.</p>';
+          return;
+        }
+        document.title = item.nazov + ' — Katalógy';
+        document.getElementById('app-breadcrumb-current').textContent = item.nazov;
+
+        el.innerHTML =
+          '<h1 class="govuk-heading-l">' + esc(item.nazov) + '</h1>' +
+          (item.hodnotenie != null ? '<p>' + stars(item.hodnotenie, item.pocet_hodnoteni) + '</p>' : '') +
+          '<p class="app-chips">' +
+            (item.oblasti || []).map(chip).join('') + demoChip(item) +
+          '</p>' +
+          (item.popis ? '<p class="govuk-body">' + esc(item.popis) + '</p>' : '') +
+          '<table class="govuk-table app-detail-table">' +
+            '<caption class="govuk-table__caption govuk-heading-s">Údaje o vzdelávaní</caption>' +
+            '<tbody class="govuk-table__body">' +
+              row('Názov', item.nazov) +
+              row('Druh vzdelávania', item.druh_vzdelavania) +
+              row('Poskytovateľ', item.poskytovatel) +
+              row('Kategória zamestnanca', item.kategoria_zamestnanca) +
+              row('Druh školy', item.druh_skoly) +
+              row('Rozsah', item.rozsah_hodin != null ? item.rozsah_hodin + ' hodín' : null) +
+              row('Stav', item.stav) +
+              row('Oblasti', (item.oblasti || []).join(', ')) +
+            '</tbody>' +
+          '</table>';
+      }).catch(function (err) {
+        el.innerHTML = '<p class="govuk-body">Dáta sa nepodarilo načítať. (' + esc(err.message) + ')</p>';
+      });
+    })();
+  </script>
+</body>
+</html>
