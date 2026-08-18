@@ -47,6 +47,8 @@ v zozname označené štítkom **Ukážka**. Vypnutie: `demoFill: false`.
 
 ## Lokálne spustenie
 
+### A) Zo snapshotu — bez tokenu
+
 ```bash
 python3 -m http.server 8000
 # alebo: npx serve
@@ -55,7 +57,31 @@ python3 -m http.server 8000
 a otvoriť http://localhost:8000. (Otvorenie `index.html` priamo zo súboru nefunguje —
 `fetch()` potrebuje HTTP server.)
 
-Obnovenie snapshotu dát lokálne:
+### B) Živo z API — cez dev-proxy
+
+```bash
+KATALOG_API_TOKEN="…" node scripts/dev-server.mjs --port 8000
+```
+
+`scripts/dev-server.mjs` servíruje statické súbory a zároveň proxuje `/api/*` na
+`katalogy.egrant.sk/api/*`. Prehliadač teda volá **rovnaký origin** — CORS sa neuplatní
+a token zostáva na serveri, do prehliadača sa nikdy nedostane. Dev-server si sám prepne
+frontend na `source: 'api'` a vypne ukážkové dáta; commitnutý `js/config.js` zostáva nedotknutý,
+takže nasadenie zo snapshotu funguje ďalej.
+
+Rovnaký princíp sa dá v produkcii nastaviť cez reverse proxy v nginxe:
+
+```nginx
+location /api/ {
+    proxy_pass https://katalogy.egrant.sk/api/;
+    proxy_set_header Authorization "Bearer $KATALOG_API_TOKEN";
+}
+```
+
+Pozn.: katalóg vzdelávania v tomto režime vráti `API error 401` — endpoint zatiaľ neexistuje
+a token je viazaný len na `katalog-ep`.
+
+### Obnovenie snapshotu dát lokálne
 
 ```bash
 KATALOG_API_TOKEN="…" node scripts/fetch-data.mjs
