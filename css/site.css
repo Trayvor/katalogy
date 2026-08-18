@@ -40,83 +40,103 @@
 /* ---------- Panel nástrojov zoznamu ---------- */
 .app-toolbar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  border: 1px solid #b1b4b6;
-  padding: 12px;
-  margin-bottom: 4px;
+  gap: 16px;
+  margin: 0 0 20px;
 }
-.app-toolbar .idsk-searchbar__wrapper { flex: 1 1 220px; max-width: 320px; }
-.app-toolbar__spacer { flex: 1 1 auto; }
+@media (max-width: 900px) {
+  .app-toolbar { flex-wrap: wrap; }
+}
+
+/* Vyhľadávacie pole s ikonou vnútri */
+.app-search { position: relative; flex: 0 1 320px; min-width: 200px; }
+.app-search__icon {
+  position: absolute;
+  z-index: 1;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #0b0c0c;
+  pointer-events: none;
+}
+.app-search .govuk-input {
+  height: 44px;
+  margin: 0;
+  padding-left: 42px;
+  border: 2px solid #0b0c0c;
+}
+
+/* Tlačidlá v paneli — biele s modrým rámom (IDSK sekundárne tlačidlo) */
+.app-toolbar .govuk-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  margin: 0;
+  background-color: #fff;
+  white-space: nowrap;
+}
+.app-toolbar .govuk-button .material-icons { font-size: 20px; }
+
 .app-toolbar__sort {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   white-space: nowrap;
+  color: #0b0c0c;
 }
-.app-toolbar__sort .govuk-select { min-width: 140px; }
-
-.app-view-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid #1d70b8;
-  background: #fff;
-  color: #1d70b8;
+.app-toolbar__sort .govuk-select {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  height: auto;
+  background: transparent;
+  color: #126dff;
+  font-weight: 600;
   cursor: pointer;
 }
-.app-view-btn--active { background: #1d70b8; color: #fff; }
+.app-toolbar__sort .govuk-select:focus { outline: 3px solid #ffdd00; }
+
+.app-toolbar__spacer { flex: 1 1 auto; }
 
 .app-filter-panel {
-  border: 1px solid #b1b4b6;
-  border-top: 0;
-  padding: 16px;
-  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
 }
-.app-filter-panel__title { margin-bottom: 12px; }
+.app-filter-panel__title { margin-bottom: 16px; }
 .app-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: flex-end;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px 20px;
+  align-items: end;
 }
-.app-filter { margin-bottom: 0; min-width: 200px; }
+.app-filter { margin-bottom: 0; }
 .app-filter .govuk-label { margin-bottom: 4px; font-weight: 700; }
 .app-filter .govuk-select { width: 100%; }
+.app-filters__actions { grid-column: 1 / -1; }
+.app-filters__actions .govuk-button { margin: 0; }
 
-.app-count { color: #505a5f; margin: 12px 0 20px; }
+.app-count { color: #505a5f; margin: 0 0 16px; }
 
 /* ---------- Výsledky ---------- */
 .app-result {
-  border: 1px solid #b1b4b6;
-  border-radius: 4px;
-  padding: 24px 30px;
-  margin-bottom: 20px;
-  display: flex;
-  gap: 24px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  padding: 20px 24px;
+  margin-bottom: 16px;
 }
-.app-result__media { display: none; }
-.app-results--cards .app-result__media {
-  display: block;
-  flex: 0 0 140px;
-}
-.app-results--cards .app-result__media img {
-  width: 140px;
-  height: 140px;
-  object-fit: cover;
-  background: #f3f2f1;
-}
-.app-result__body { flex: 1 1 auto; min-width: 0; }
 .app-result__head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
 }
-.app-result__title { margin: 0 0 10px; }
+.app-result__title { margin: 0 0 12px; }
 .app-result__title a { font-size: 1.2rem; font-weight: 700; }
 .app-result__desc {
   margin: 0 0 12px;
@@ -129,8 +149,8 @@
 .app-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 20px;
-  margin: 0 0 12px;
+  gap: 6px 24px;
+  margin: 0;
   color: #0b0c0c;
 }
 .app-meta__item {
@@ -141,12 +161,12 @@
 }
 .app-meta__item .material-icons { font-size: 18px; color: #505a5f; }
 
-.app-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.app-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
 .app-chip {
   display: inline-block;
-  border: 1px solid #1d70b8;
+  border: 1px solid #126dff;
   border-radius: 4px;
-  color: #1d70b8;
+  color: #126dff;
   background: #fff;
   font-size: 0.85rem;
   padding: 2px 8px;

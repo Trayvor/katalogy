@@ -29,34 +29,22 @@
 
     <main class="govuk-main-wrapper" id="main-content">
       <h1 class="govuk-heading-l">Katalóg vzdelávania v profesijnom rozvoji</h1>
-      <p class="govuk-body">
-        Katalóg vzdelávania v profesijnom rozvoji pedagogických zamestnancov a odborných
-        zamestnancov je stručne predstavený v tomto popise. Text poskytuje len základný prehľad.<br>
-        Podrobnejší opis katalógu si môžete zobraziť kliknutím na link nižšie.
-      </p>
-      <p class="govuk-body">
-        <a class="govuk-link" href="#">Viac informácií o katalógu</a>&nbsp;&nbsp;&nbsp;
-        <a class="govuk-link" href="#">Ako pracovať s katalógom?</a>
-      </p>
 
       <div class="app-toolbar">
-        <div class="idsk-searchbar__wrapper" role="search">
-          <input class="govuk-input" type="search" id="app-search" placeholder="Hľadať vzdelávanie" title="Zadajte hľadaný výraz">
-          <button class="govuk-button govuk-button__basic" aria-label="Hľadať"><span class="material-icons" aria-hidden="true">search</span></button>
+        <div class="app-search" role="search">
+          <span class="material-icons app-search__icon" aria-hidden="true">search</span>
+          <input class="govuk-input" type="search" id="app-search" aria-label="Hľadať vzdelávanie" title="Zadajte hľadaný výraz">
         </div>
         <button type="button" class="govuk-button govuk-button--sec" id="app-filter-toggle" aria-expanded="true" aria-controls="app-filter-panel">
-          <span class="material-icons" aria-hidden="true">filter_list</span>&nbsp;Filter
+          <span class="material-icons" aria-hidden="true">filter_list</span>Filter
         </button>
         <span class="app-toolbar__sort govuk-body-s">
           Triediť podľa:
           <select class="govuk-select" id="app-sort" aria-label="Triediť podľa"></select>
         </span>
         <span class="app-toolbar__spacer"></span>
-        <span class="govuk-body-s">Zobrazenie:</span>
-        <button type="button" class="app-view-btn" id="app-view-list" aria-label="Zobrazenie zoznam"><span class="material-icons" aria-hidden="true">view_list</span></button>
-        <button type="button" class="app-view-btn" id="app-view-cards" aria-label="Zobrazenie karty"><span class="material-icons" aria-hidden="true">view_agenda</span></button>
         <button type="button" class="govuk-button govuk-button--sec" id="app-export">
-          Export&nbsp;<span class="material-icons" aria-hidden="true">download</span>
+          Export<span class="material-icons" aria-hidden="true">expand_more</span>
         </button>
       </div>
 
@@ -94,24 +82,21 @@
         { key: 'hours', label: 'Rozsah hodín', compare: function (a, b) { return (b.rozsah_hodin || 0) - (a.rozsah_hodin || 0); } }
       ],
       csvColumns: ['id', 'nazov', 'druh_vzdelavania', 'poskytovatel', 'kategoria_zamestnanca', 'druh_skoly', 'rozsah_hodin', 'stav', 'hodnotenie'],
-      renderItem: function (item, view) {
+      renderItem: function (item) {
         return '<article class="app-result">' +
-          '<div class="app-result__media"><img src="idsk/assets/images/placeholder.png" alt=""></div>' +
-          '<div class="app-result__body">' +
-            '<div class="app-result__head">' +
-              '<h3 class="app-result__title"><a class="govuk-link" href="detail-vzdelavania.html?id=' + encodeURIComponent(item.id) + '">' + esc(item.nazov) + '</a></h3>' +
-              (view === 'cards' && item.hodnotenie != null ? '<span>' + stars(item.hodnotenie, item.pocet_hodnoteni) + '</span>' : '') +
-            '</div>' +
-            '<p class="govuk-body app-result__desc">' + esc(item.popis || '') + '</p>' +
-            '<p class="app-meta">' +
-              metaItem('person', item.poskytovatel) +
-              metaItem('settings', item.stav) +
-              metaItem('schedule', item.rozsah_hodin != null ? item.rozsah_hodin + ' hodín' : '') +
-            '</p>' +
-            '<p class="app-chips">' +
-              (item.oblasti || []).map(chip).join('') +
-            '</p>' +
+          '<div class="app-result__head">' +
+            '<h3 class="app-result__title"><a class="govuk-link" href="detail-vzdelavania.html?id=' + encodeURIComponent(item.id) + '">' + esc(item.nazov) + '</a></h3>' +
+            (item.hodnotenie != null ? '<span>' + stars(item.hodnotenie, item.pocet_hodnoteni) + '</span>' : '') +
           '</div>' +
+          '<p class="govuk-body app-result__desc">' + esc(item.popis || '') + '</p>' +
+          '<p class="app-meta">' +
+            metaItem('person', item.poskytovatel) +
+            metaItem('settings', item.stav) +
+            metaItem('schedule', item.rozsah_hodin != null ? item.rozsah_hodin + ' hodín' : '') +
+          '</p>' +
+          '<p class="app-chips">' +
+            (item.oblasti || []).map(chip).join('') +
+          '</p>' +
         '</article>';
       }
     });

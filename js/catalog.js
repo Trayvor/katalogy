@@ -1,22 +1,24 @@
-// Generický "engine" pre katalógové zoznamy: vyhľadávanie, filtre, triedenie,
-// prepínanie zobrazenia (zoznam/karty) a export do CSV.
+// Generický "engine" pre katalógové zoznamy: vyhľadávanie, filtre, triedenie
+// a export do CSV.
 //
 // Použitie (na stránke katalógu):
 //   initCatalog({
-//     name: 'katalog-ep',                       // endpoint: /api/<name>/
-//     searchFields: ['nazov', ...],             // polia pre fulltextové vyhľadávanie
-//     filters: [{ key, label, getValue(item) }],// selecty — hodnoty sa odvodia z dát
+//     name: 'katalog-ep',                        // endpoint: /api/<name>/
+//     searchFields: ['nazov', ...],              // polia pre fulltextové vyhľadávanie
+//     filters: [{ key, label, getValue(item), options? }],
 //     sorts: [{ key, label, compare(a, b) }],
-//     renderItem: function (item, view) { return '<article>…</article>'; }
+//     renderItem: function (item) { return '<article>…</article>'; }
 //   });
+//
+// `options` je voliteľný zoznam všetkých prípustných hodnôt (podľa formulára).
+// Ak chýba, hodnoty sa odvodia z načítaných dát.
 
 function initCatalog(opts) {
   const state = {
     items: [],
     query: '',
     filters: {},
-    sort: opts.sorts[0].key,
-    view: localStorage.getItem('katalog-view') || 'list'
+    sort: opts.sorts[0].key
   };
 
   const $ = function (id) { return document.getElementById(id); };
@@ -45,30 +47,42 @@ function initCatalog(opts) {
     if (sort) items.sort(sort.compare);
 
     countEl.textContent = 'Počet záznamov: ' + items.length;
-    resultsEl.className = 'app-results app-results--' + state.view;
     resultsEl.innerHTML = items.length
-      ? items.map(function (item) { return opts.renderItem(item, state.view); }).join('')
+      ? items.map(function (item) { return opts.renderItem(item); }).join('')
       : '<p class="govuk-body">Nenašli sa žiadne záznamy. Skúste upraviť vyhľadávanie alebo filtre.</p>';
 
     state.filtered = items;
   }
 
+  // Hodnoty selectu: prednastavený zoznam z formulára + čokoľvek navyše, čo prišlo z API
+  function filterValues(f) {
+    const fromData = state.items
+      .map(function (item) { return f.getValue(item); })
+      .filter(function (v) { return v != null && v !== ''; })
+      .map(String);
+
+    if (!f.options) {
+      return Array.from(new Set(fromData))
+        .sort(function (a, b) { return a.localeCompare(b, 'sk'); });
+    }
+    const extra = fromData.filter(function (v) { return f.options.indexOf(v) === -1; });
+    return f.options.concat(Array.from(new Set(extra)));
+  }
+
   function buildFilters() {
     filtersEl.innerHTML = opts.filters.map(function (f) {
-      const values = Array.from(new Set(
-        state.items.map(function (item) { return f.getValue(item); })
-          .filter(function (v) { return v != null && v !== ''; })
-          .map(String)
-      )).sort(function (a, b) { return a.localeCompare(b, 'sk'); });
-
       return '<div class="govuk-form-group app-filter">' +
         '<label class="govuk-label govuk-body-s" for="filter-' + f.key + '">' + esc(f.label) + '</label>' +
         '<select class="govuk-select" id="filter-' + f.key + '" data-filter="' + f.key + '">' +
-        '<option value="">' + esc(f.label) + ' — všetky</option>' +
-        values.map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + '</option>'; }).join('') +
+        '<option value="">Všetky</option>' +
+        filterValues(f).map(function (v) {
+          return '<option value="' + esc(v) + '">' + esc(v) + '</option>';
+        }).join('') +
         '</select></div>';
     }).join('') +
-    '<button type="button" class="govuk-button govuk-button--texted" id="app-filters-reset">Zrušiť filtre</button>';
+    '<div class="app-filters__actions">' +
+      '<button type="button" class="govuk-button govuk-button--texted" id="app-filters-reset">Zrušiť filtre</button>' +
+    '</div>';
 
     filtersEl.querySelectorAll('select[data-filter]').forEach(function (sel) {
       sel.addEventListener('change', function () {
@@ -104,23 +118,8 @@ function initCatalog(opts) {
       this.setAttribute('aria-expanded', String(open));
     });
 
-    ['list', 'cards'].forEach(function (view) {
-      $('app-view-' + view).addEventListener('click', function () {
-        state.view = view;
-        localStorage.setItem('katalog-view', view);
-        updateViewButtons();
-        applyState();
-      });
-    });
-
     const exportBtn = $('app-export');
     if (exportBtn) exportBtn.addEventListener('click', function () { exportCsv(); });
-  }
-
-  function updateViewButtons() {
-    ['list', 'cards'].forEach(function (view) {
-      $('app-view-' + view).classList.toggle('app-view-btn--active', state.view === view);
-    });
   }
 
   function exportCsv() {
@@ -147,7 +146,6 @@ function initCatalog(opts) {
     buildFilters();
     buildSorts();
     bindToolbar();
-    updateViewButtons();
     applyState();
   }).catch(function (err) {
     resultsEl.innerHTML = '<p class="govuk-body">Dáta sa nepodarilo načítať. (' + esc(err.message) + ')</p>';
