@@ -12,32 +12,34 @@
 </head>
 <body class="govuk-template__body">
   <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+  <a class="app-skip-link" href="#main-content" data-i18n>Preskočiť na hlavný obsah</a>
 
   <div id="app-header"></div>
 
   <div class="govuk-width-container">
-    <div class="govuk-breadcrumbs">
+    <nav class="govuk-breadcrumbs" aria-label="Navigácia">
       <ol class="govuk-breadcrumbs__list">
         <li class="govuk-breadcrumbs__list-item">
-          <a class="govuk-breadcrumbs__link" href="index.html">Úvod</a>
+          <a class="govuk-breadcrumbs__link" href="index.html" data-i18n>Úvod</a>
         </li>
         <li class="govuk-breadcrumbs__list-item">
-          <a class="govuk-breadcrumbs__link" href="katalog-vzdelavania.html">Katalóg vzdelávania v profesijnom rozvoji</a>
+          <a class="govuk-breadcrumbs__link" href="katalog-vzdelavania.html" data-i18n>Katalóg vzdelávania v profesijnom rozvoji</a>
         </li>
-        <li class="govuk-breadcrumbs__list-item" id="app-breadcrumb-current"></li>
+        <li class="govuk-breadcrumbs__list-item" id="app-breadcrumb-current" aria-current="page"></li>
       </ol>
-    </div>
+    </nav>
 
     <main class="govuk-main-wrapper" id="main-content">
       <a class="govuk-link app-back-link" href="katalog-vzdelavania.html">
-        <span class="material-icons" aria-hidden="true">west</span>Späť na katalóg
+        <span class="material-icons" aria-hidden="true">west</span><span data-i18n>Späť na katalóg</span>
       </a>
-      <div id="app-detail"><p class="govuk-body">Načítava sa…</p></div>
+      <div id="app-detail"><p class="govuk-body" data-i18n>Načítava sa…</p></div>
     </main>
   </div>
 
   <div id="app-footer"></div>
 
+  <script src="js/i18n.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/catalog.js"></script>
@@ -47,43 +49,43 @@
       const id = new URLSearchParams(location.search).get('id');
       const el = document.getElementById('app-detail');
 
-      function row(label, value) {
-        if (value == null || value === '') return '';
-        return '<tr class="govuk-table__row">' +
-          '<th scope="row" class="govuk-table__header">' + label + '</th>' +
-          '<td class="govuk-table__cell">' + esc(value) + '</td></tr>';
+      // Jeden riadok karty: popisok vľavo, hodnota vpravo
+      function row(label, valueHtml) {
+        if (valueHtml == null || valueHtml === '') return '';
+        return '<div class="app-detail-row">' +
+          '<span class="app-detail-row__label">' + esc(t(label)) + '</span>' +
+          '<span class="app-detail-row__value">' + valueHtml + '</span></div>';
       }
 
       loadItem('katalog-vzdelavania', id).then(function (item) {
         if (!item) {
-          el.innerHTML = '<p class="govuk-body">Vzdelávanie sa nenašlo.</p>';
+          el.innerHTML = '<p class="govuk-body">' + t('Vzdelávanie sa nenašlo.') + '</p>';
           return;
         }
-        document.title = item.nazov + ' — Katalógy';
+        document.title = item.nazov + ' — ' + t('Katalógy');
         document.getElementById('app-breadcrumb-current').textContent = item.nazov;
+
+        const oblasti = (item.oblasti || []).map(function (o) {
+          return '<span class="app-pill">' + esc(o) + '</span>';
+        }).join('');
 
         el.innerHTML =
           '<h1 class="govuk-heading-l">' + esc(item.nazov) + '</h1>' +
           (item.hodnotenie != null ? '<p>' + stars(item.hodnotenie, item.pocet_hodnoteni) + '</p>' : '') +
-          '<p class="app-chips">' +
-            (item.oblasti || []).map(chip).join('') +
-          '</p>' +
           (item.popis ? '<p class="govuk-body">' + esc(item.popis) + '</p>' : '') +
-          '<table class="govuk-table app-detail-table">' +
-            '<caption class="govuk-table__caption govuk-heading-s">Údaje o vzdelávaní</caption>' +
-            '<tbody class="govuk-table__body">' +
-              row('Názov', item.nazov) +
-              row('Druh vzdelávania', item.druh_vzdelavania) +
-              row('Poskytovateľ', item.poskytovatel) +
-              row('Kategória zamestnanca', item.kategoria_zamestnanca) +
-              row('Druh školy', item.druh_skoly) +
-              row('Rozsah', item.rozsah_hodin != null ? item.rozsah_hodin + ' hodín' : null) +
-              row('Stav', item.stav) +
-              row('Oblasti', (item.oblasti || []).join(', ')) +
-            '</tbody>' +
-          '</table>';
+          '<section class="app-detail-card" aria-label="' + t('O vzdelávaní') + '">' +
+            '<h2 class="govuk-heading-s app-detail-card__title">' + t('O vzdelávaní') + '</h2>' +
+            row('Názov', esc(item.nazov)) +
+            row('Druh vzdelávania', esc(item.druh_vzdelavania)) +
+            row('Poskytovateľ', esc(item.poskytovatel)) +
+            row('Kategória zamestnanca', esc(item.kategoria_zamestnanca)) +
+            row('Druh školy', esc(item.druh_skoly)) +
+            row('Rozsah', item.rozsah_hodin != null ? esc(item.rozsah_hodin) + ' ' + t('hodín') : '') +
+            row('Stav', esc(item.stav)) +
+            row('Oblasti', oblasti ? '<span class="app-pills">' + oblasti + '</span>' : '') +
+          '</section>';
       }).catch(function (err) {
-        el.innerHTML = '<p class="govuk-body">Dáta sa nepodarilo načítať. (' + esc(err.message) + ')</p>';
+        el.innerHTML = '<p class="govuk-body">' + t('Dáta sa nepodarilo načítať.') + ' (' + esc(err.message) + ')</p>';
       });
     })();
   </script>

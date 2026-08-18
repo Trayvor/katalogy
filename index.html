@@ -12,20 +12,21 @@
 </head>
 <body class="govuk-template__body">
   <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+  <a class="app-skip-link" href="#main-content" data-i18n>Preskočiť na hlavný obsah</a>
 
   <div id="app-header"></div>
 
   <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content">
 
-      <h2 class="govuk-heading-m">Pre pedagogických a odborných zamestnancov</h2>
+      <h2 class="govuk-heading-m" data-i18n>Pre pedagogických a odborných zamestnancov</h2>
 
       <div class="app-signposts">
         <a class="govuk-signpost govuk-signpost__card govuk-signpost__link" href="katalog-vzdelavania.html">
           <div class="govuk-signpost__container">
             <div>
-              <h3 class="govuk-signpost__title">Katalóg vzdelávania v profesijnom rozvoji PZ a OZ</h3>
-              <p class="govuk-signpost__description">Schválené programy a moduly vzdelávania.</p>
+              <h3 class="govuk-signpost__title" data-i18n>Katalóg vzdelávania v profesijnom rozvoji PZ a OZ</h3>
+              <p class="govuk-signpost__description" data-i18n>Schválené programy a moduly vzdelávania.</p>
             </div>
             <div class="govuk-signpost__arrow-icon">
               <span class="material-icons" aria-hidden="true">east</span>
@@ -36,8 +37,8 @@
         <a class="govuk-signpost govuk-signpost__card govuk-signpost__link" href="katalog-ep.html">
           <div class="govuk-signpost__container">
             <div>
-              <h3 class="govuk-signpost__title">Katalóg edukačných publikácií</h3>
-              <p class="govuk-signpost__description">Schválené edukačné publikácie.</p>
+              <h3 class="govuk-signpost__title" data-i18n>Katalóg edukačných publikácií</h3>
+              <p class="govuk-signpost__description" data-i18n>Schválené edukačné publikácie.</p>
             </div>
             <div class="govuk-signpost__arrow-icon">
               <span class="material-icons" aria-hidden="true">east</span>
@@ -46,7 +47,7 @@
         </a>
       </div>
 
-      <h2 class="govuk-heading-m">Pre žiadateľov</h2>
+      <h2 class="govuk-heading-m" data-i18n>Pre žiadateľov</h2>
 
       <div class="app-hero">
         <div class="app-hero__illustration" aria-hidden="true">
@@ -65,10 +66,10 @@
           </svg>
         </div>
         <div>
-          <h2 class="govuk-heading-l">Chcete podať novú žiadosť do katalógu?</h2>
-          <p class="govuk-body">Pošlite nám vašu žiadosť!</p>
+          <h2 class="govuk-heading-l" data-i18n>Chcete podať novú žiadosť do katalógu?</h2>
+          <p class="govuk-body" data-i18n>Pošlite nám vašu žiadosť!</p>
           <a class="govuk-button govuk-button--sec" href="#" role="button">
-            Nová žiadosť&nbsp;<span class="material-icons" aria-hidden="true">east</span>
+            <span data-i18n>Nová žiadosť</span>&nbsp;<span class="material-icons" aria-hidden="true">east</span>
           </a>
         </div>
       </div>
@@ -78,6 +79,7 @@
 
   <div id="app-footer"></div>
 
+  <script src="js/i18n.js"></script>
   <script src="js/config.js"></script>
   <script type="module" src="js/common.js"></script>
 </body>

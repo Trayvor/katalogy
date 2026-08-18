@@ -12,55 +12,58 @@
 </head>
 <body class="govuk-template__body">
   <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+  <a class="app-skip-link" href="#main-content" data-i18n>Preskočiť na hlavný obsah</a>
 
   <div id="app-header"></div>
 
   <div class="govuk-width-container">
-    <div class="govuk-breadcrumbs">
+    <nav class="govuk-breadcrumbs" aria-label="Navigácia">
       <ol class="govuk-breadcrumbs__list">
         <li class="govuk-breadcrumbs__list-item">
-          <a class="govuk-breadcrumbs__link" href="index.html">Úvod</a>
+          <a class="govuk-breadcrumbs__link" href="index.html" data-i18n>Úvod</a>
         </li>
         <li class="govuk-breadcrumbs__list-item">
-          <a class="govuk-breadcrumbs__link" href="katalog-ep.html">Katalóg edukačných publikácií</a>
+          <a class="govuk-breadcrumbs__link" href="katalog-ep.html" data-i18n>Katalóg edukačných publikácií</a>
         </li>
       </ol>
-    </div>
+    </nav>
 
     <main class="govuk-main-wrapper" id="main-content">
-      <h1 class="govuk-heading-l">Katalóg edukačných publikácií</h1>
+      <h1 class="govuk-heading-l" data-i18n>Katalóg edukačných publikácií</h1>
 
       <div class="app-toolbar">
         <div class="app-search" role="search">
           <span class="material-icons app-search__icon" aria-hidden="true">search</span>
-          <input class="govuk-input" type="search" id="app-search" aria-label="Hľadať publikáciu" title="Zadajte hľadaný výraz">
+          <input class="govuk-input" type="search" id="app-search" aria-label="Hľadať publikáciu" title="Zadajte hľadaný výraz" data-i18n-attr="aria-label,title">
         </div>
         <button type="button" class="govuk-button govuk-button--sec" id="app-filter-toggle" aria-expanded="true" aria-controls="app-filter-panel">
-          <span class="material-icons" aria-hidden="true">filter_list</span>Filter
+          <span class="material-icons" aria-hidden="true">filter_list</span><span data-i18n>Filter</span>
         </button>
         <span class="app-toolbar__sort govuk-body-s">
-          Triediť podľa:
-          <select class="govuk-select" id="app-sort" aria-label="Triediť podľa"></select>
+          <label class="app-toolbar__sort-label" for="app-sort" data-i18n>Triediť podľa:</label>
+          <select class="govuk-select" id="app-sort"></select>
         </span>
         <span class="app-toolbar__spacer"></span>
         <button type="button" class="govuk-button govuk-button--sec" id="app-export">
-          Export<span class="material-icons" aria-hidden="true">expand_more</span>
+          <span data-i18n>Export</span>
         </button>
       </div>
 
       <div class="app-filter-panel" id="app-filter-panel">
-        <h3 class="govuk-heading-s app-filter-panel__title">Základné filtre</h3>
+        <h3 class="govuk-heading-s app-filter-panel__title" data-i18n>Základné filtre</h3>
         <div class="app-filters" id="app-filters"></div>
       </div>
 
       <p class="govuk-body-s app-count" id="app-count" aria-live="polite"></p>
 
+      <h2 class="govuk-visually-hidden" data-i18n>Výsledky vyhľadávania</h2>
       <div class="app-results" id="app-results"></div>
     </main>
   </div>
 
   <div id="app-footer"></div>
 
+  <script src="js/i18n.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/catalog.js"></script>

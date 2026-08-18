@@ -46,10 +46,10 @@ function initCatalog(opts) {
     const sort = opts.sorts.find(function (s) { return s.key === state.sort; });
     if (sort) items.sort(sort.compare);
 
-    countEl.textContent = 'Počet záznamov: ' + items.length;
+    countEl.textContent = t('Počet záznamov') + ': ' + items.length;
     resultsEl.innerHTML = items.length
       ? items.map(function (item) { return opts.renderItem(item); }).join('')
-      : '<p class="govuk-body">Nenašli sa žiadne záznamy. Skúste upraviť vyhľadávanie alebo filtre.</p>';
+      : '<p class="govuk-body">' + t('Nenašli sa žiadne záznamy. Skúste upraviť vyhľadávanie alebo filtre.') + '</p>';
 
     state.filtered = items;
   }
@@ -72,16 +72,16 @@ function initCatalog(opts) {
   function buildFilters() {
     filtersEl.innerHTML = opts.filters.map(function (f) {
       return '<div class="govuk-form-group app-filter">' +
-        '<label class="govuk-label govuk-body-s" for="filter-' + f.key + '">' + esc(f.label) + '</label>' +
+        '<label class="govuk-label govuk-body-s" for="filter-' + f.key + '">' + esc(t(f.label)) + '</label>' +
         '<select class="govuk-select" id="filter-' + f.key + '" data-filter="' + f.key + '">' +
-        '<option value="">Všetky</option>' +
+        '<option value="">' + t('Všetky') + '</option>' +
         filterValues(f).map(function (v) {
           return '<option value="' + esc(v) + '">' + esc(v) + '</option>';
         }).join('') +
         '</select></div>';
     }).join('') +
     '<div class="app-filters__actions">' +
-      '<button type="button" class="govuk-button govuk-button--texted" id="app-filters-reset">Zrušiť filtre</button>' +
+      '<button type="button" class="govuk-button govuk-button--texted" id="app-filters-reset">' + t('Zrušiť filtre') + '</button>' +
     '</div>';
 
     filtersEl.querySelectorAll('select[data-filter]').forEach(function (sel) {
@@ -100,7 +100,7 @@ function initCatalog(opts) {
   function buildSorts() {
     const sel = $('app-sort');
     sel.innerHTML = opts.sorts.map(function (s) {
-      return '<option value="' + s.key + '">' + esc(s.label) + '</option>';
+      return '<option value="' + s.key + '">' + esc(t(s.label)) + '</option>';
     }).join('');
     sel.addEventListener('change', function () { state.sort = sel.value; applyState(); });
   }
@@ -148,7 +148,7 @@ function initCatalog(opts) {
     bindToolbar();
     applyState();
   }).catch(function (err) {
-    resultsEl.innerHTML = '<p class="govuk-body">Dáta sa nepodarilo načítať. (' + esc(err.message) + ')</p>';
+    resultsEl.innerHTML = '<p class="govuk-body">' + t('Dáta sa nepodarilo načítať.') + ' (' + esc(err.message) + ')</p>';
   });
 }
 
