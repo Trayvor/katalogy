@@ -152,11 +152,6 @@
   padding: 2px 8px;
   white-space: nowrap;
 }
-.app-chip--demo {
-  border-color: #f47738;
-  color: #f47738;
-}
-
 .app-stars { color: #ffa000; display: inline-flex; }
 .app-stars .material-icons { font-size: 20px; }
 .app-stars__label { color: #505a5f; margin-left: 6px; white-space: nowrap; }

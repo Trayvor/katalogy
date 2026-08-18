@@ -3,7 +3,7 @@
 //
 // Použitie (na stránke katalógu):
 //   initCatalog({
-//     name: 'katalog-ep',                       // názov datasetu (data/<name>.json)
+//     name: 'katalog-ep',                       // endpoint: /api/<name>/
 //     searchFields: ['nazov', ...],             // polia pre fulltextové vyhľadávanie
 //     filters: [{ key, label, getValue(item) }],// selecty — hodnoty sa odvodia z dát
 //     sorts: [{ key, label, compare(a, b) }],
@@ -157,10 +157,6 @@ function initCatalog(opts) {
 // Zdieľané kúsky UI
 function chip(text) {
   return text ? '<span class="app-chip">' + esc(text) + '</span>' : '';
-}
-
-function demoChip(item) {
-  return item._demo ? '<span class="app-chip app-chip--demo">Ukážka</span>' : '';
 }
 
 function metaItem(icon, text) {

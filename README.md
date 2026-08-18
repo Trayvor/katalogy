@@ -1,97 +1,92 @@
-# Katalógy — MŠVVaM SR (demo)
+# Katalógy — MŠVVaM SR
 
-Statický web (bez backendu) s katalógmi Ministerstva školstva, výskumu, vývoja a mládeže SR,
+Statický web s katalógmi Ministerstva školstva, výskumu, vývoja a mládeže SR,
 postavený podľa dizajnového systému [IDSK 3](https://idsk.gov.sk/).
 
-## Obsah
-
-- **Úvodná stránka** — rozcestník s kartami katalógov
-- **Katalóg edukačných publikácií** — dáta z API `katalogy.egrant.sk` (snapshot)
-- **Katalóg vzdelávania v profesijnom rozvoji PZ a OZ** — zatiaľ ukážkové dáta (API endpoint sa doplní)
+- **Katalóg edukačných publikácií**
+- **Katalóg vzdelávania v profesijnom rozvoji PZ a OZ**
 
 ## Architektúra
 
-Čisto statický web: HTML + IDSK 3 (skompilované CSS/JS v `idsk/`) + vanilla JavaScript.
-Žiadny build ani framework.
+Čistá statika: HTML + IDSK 3 + vanilla JavaScript. Žiadny build, žiadny framework,
+žiadne `node_modules`. Obsah repozitára = obsah webrootu.
 
 ```
-index.html                  úvodná stránka
+index.html                  úvodná stránka (rozcestník)
 katalog-ep.html             zoznam edukačných publikácií
 detail-ep.html?id=…         detail publikácie
 katalog-vzdelavania.html    zoznam vzdelávaní
-detail-vzdelavania.html     detail vzdelávania
+detail-vzdelavania.html?id=…  detail vzdelávania
 idsk/                       IDSK 3 assets (z balíka @id-sk/frontend v3)
 css/site.css                doplnkové štýly
-js/config.js                konfigurácia zdroja dát
-js/data.js, js/catalog.js   načítanie dát + logika zoznamov (hľadanie, filtre, triedenie, CSV export)
-js/common.js                spoločný header/footer
-data/*.json                 snapshot dát z API + ukážkové (demo) záznamy
-scripts/fetch-data.mjs      obnovenie snapshotu z API
-.github/workflows/deploy.yml  automatický deploy na GitHub Pages
+js/config.js                adresa API
+js/data.js                  načítanie dát
+js/catalog.js               logika zoznamov (hľadanie, filtre, triedenie, CSV export)
+js/common.js                spoločná hlavička a pätička
+scripts/dev-server.mjs      vývojový server s proxy na API
+Jenkinsfile                 deploy na interný server
 ```
 
-### Prečo snapshot a nie živé volania API?
+## Dáta
 
-API `katalogy.egrant.sk` zatiaľ neposiela CORS hlavičky, takže prehliadač by priame volania
-z inej domény zablokoval. Navyše by bol Bearer token viditeľný vo verejnom kóde.
-Preto sa dáta sťahujú **pri deployi** (GitHub Actions, token v Secrets) a ukladajú do `data/*.json`.
-Snapshot sa obnovuje pri každom pushi a automaticky každý deň o 03:00 UTC.
+Frontend načítava dáta z **`/api/…` na rovnakom origine** ako web:
 
-Ak sa na API zapne CORS, stačí v `js/config.js` prepnúť `source: 'api'`.
+```
+prehliadač → /api/katalog-ep/ → [reverse proxy] → https://katalogy.egrant.sk/api/katalog-ep/
+```
 
-### Ukážkové dáta
+Vďaka tomu sa neuplatní CORS (API neposiela `Access-Control-Allow-Origin`)
+a **API token nikdy neopustí server** — pridáva ho proxy, nie prehliadač.
 
-`demoFill: true` v `js/config.js` pridáva k reálnym dátam ukážkové záznamy
-(`data/*-demo.json`), aby zoznamy pri prezentácii neboli prázdne. Ukážkové záznamy sú
-v zozname označené štítkom **Ukážka**. Vypnutie: `demoFill: false`.
+Adresa API sa mení v `js/config.js` (`apiBaseUrl`).
 
 ## Lokálne spustenie
-
-### A) Zo snapshotu — bez tokenu
-
-```bash
-python3 -m http.server 8000
-# alebo: npx serve
-```
-
-a otvoriť http://localhost:8000. (Otvorenie `index.html` priamo zo súboru nefunguje —
-`fetch()` potrebuje HTTP server.)
-
-### B) Živo z API — cez dev-proxy
 
 ```bash
 KATALOG_API_TOKEN="…" node scripts/dev-server.mjs --port 8000
 ```
 
-`scripts/dev-server.mjs` servíruje statické súbory a zároveň proxuje `/api/*` na
-`katalogy.egrant.sk/api/*`. Prehliadač teda volá **rovnaký origin** — CORS sa neuplatní
-a token zostáva na serveri, do prehliadača sa nikdy nedostane. Dev-server si sám prepne
-frontend na `source: 'api'` a vypne ukážkové dáta; commitnutý `js/config.js` zostáva nedotknutý,
-takže nasadenie zo snapshotu funguje ďalej.
+Otvoriť http://localhost:8000. Dev-server servíruje statické súbory a zároveň proxuje
+`/api/*` na `katalogy.egrant.sk/api/*` s pridaným tokenom.
 
-Rovnaký princíp sa dá v produkcii nastaviť cez reverse proxy v nginxe:
+Otvorenie `index.html` priamo zo súboru nefunguje — `fetch()` potrebuje HTTP server.
+
+## Nasadenie
+
+Skopírovať súbory do webrootu (`Jenkinsfile` robí `rsync`) a vo webserveri nastaviť
+reverse proxy na API. nginx:
 
 ```nginx
-location /api/ {
-    proxy_pass https://katalogy.egrant.sk/api/;
-    proxy_set_header Authorization "Bearer $KATALOG_API_TOKEN";
+server {
+    root /var/www/katalogy;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /api/ {
+        proxy_pass https://katalogy.egrant.sk/api/;
+        proxy_set_header Authorization "Bearer <token>";
+    }
 }
 ```
 
-Pozn.: katalóg vzdelávania v tomto režime vráti `API error 401` — endpoint zatiaľ neexistuje
-a token je viazaný len na `katalog-ep`.
+Požiadavky na server:
 
-### Obnovenie snapshotu dát lokálne
+- ľubovoľný statický webserver — **žiadny backend, žiadny Node runtime**
+- správne MIME typy pre `.js` (`text/javascript`) — skripty sa načítavajú ako ES moduly
+- web funguje aj v podadresári, všetky cesty k assetom sú relatívne
 
-```bash
-KATALOG_API_TOKEN="…" node scripts/fetch-data.mjs
-```
+Ak sa web nasadí priamo na doménu API (`katalogy.egrant.sk`), proxy netreba —
+stačí v `js/config.js` nastaviť `apiBaseUrl: '/api'` (predvolené) a volania budú same-origin.
 
-## Deploy na GitHub Pages
+## Stav API
 
-1. Push do vetvy `main` — workflow `.github/workflows/deploy.yml` sa spustí automaticky.
-2. V nastaveniach repozitára: **Settings → Pages → Source: GitHub Actions** (nastavené pri vytvorení).
-3. Voliteľné: **Settings → Secrets and variables → Actions → New repository secret** —
-   `KATALOG_API_TOKEN` s API tokenom, aby sa dáta pri deployi obnovovali z API.
+| Katalóg | Endpoint | Stav |
+| --- | --- | --- |
+| Edukačné publikácie | `/api/katalog-ep/` | funguje |
+| Vzdelávanie v profesijnom rozvoji | `/api/katalog-vzdelavania/` | **zatiaľ neexistuje** — vracia 401 |
 
-Web bude dostupný na `https://<užívateľ>.github.io/<repozitár>/`.
+Token je viazaný len na `katalog-ep`. Kým nepribudne druhý endpoint, katalóg vzdelávania
+zobrazí hlásenie o nedostupnosti dát.

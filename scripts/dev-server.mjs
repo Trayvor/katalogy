@@ -32,17 +32,6 @@ const MIME = {
   '.woff2': 'font/woff2'
 };
 
-// Prepne frontend na živé API cez túto proxy — bez zásahu do commitnutého js/config.js,
-// takže nasadenie na GitHub Pages (snapshot) zostáva nedotknuté.
-const CONFIG_OVERRIDE = `
-/* --- pridané dev-serverom (scripts/dev-server.mjs) --- */
-window.KATALOG_CONFIG.source = 'api';
-window.KATALOG_CONFIG.api.baseUrl = '/api';   // same-origin → žiadny CORS
-window.KATALOG_CONFIG.api.token = '';         // token pridáva proxy, nie prehliadač
-window.KATALOG_CONFIG.demoFill = false;       // iba reálne dáta z API
-console.info('[dev-server] dáta sa načítavajú živo z API cez lokálnu proxy');
-`;
-
 async function proxyToApi(req, res) {
   if (!TOKEN) {
     res.writeHead(500, { 'content-type': 'application/json; charset=utf-8' });
@@ -82,10 +71,7 @@ const server = createServer(async (req, res) => {
   }
 
   try {
-    let content = await readFile(file);
-    if (rel === '/js/config.js' || rel === '\\js\\config.js') {
-      content = Buffer.concat([content, Buffer.from(CONFIG_OVERRIDE)]);
-    }
+    const content = await readFile(file);
     res.writeHead(200, {
       'content-type': MIME[extname(file)] || 'application/octet-stream',
       // vývojový server — nikdy necachovať, inak prehliadač drží starý config.js/JS

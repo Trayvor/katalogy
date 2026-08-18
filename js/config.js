@@ -1,17 +1,11 @@
-// Konfigurácia zdroja dát
+// Konfigurácia zdroja dát.
+//
+// Dáta sa načítavajú z /api/... na rovnakom origine ako web, takže sa neuplatní CORS
+// a API token nikdy neopustí server.
+//
+//   lokálne   → scripts/dev-server.mjs proxuje /api/* na katalogy.egrant.sk
+//   produkcia → reverse proxy vo webserveri (nginx, pozri README.md)
+
 window.KATALOG_CONFIG = {
-  // 'snapshot' — dáta z lokálnych JSON súborov (aktualizované pri deployi cez GitHub Actions)
-  // 'api'      — živé volania API (vyžaduje zapnutý CORS na strane servera + token nižšie)
-  source: 'snapshot',
-
-  api: {
-    baseUrl: 'https://katalogy.egrant.sk/api',
-    // POZOR: nikdy sem necommitujte reálny token — stránka je verejná.
-    // Token pre build-time snapshot patrí do GitHub Secrets (KATALOG_API_TOKEN).
-    token: ''
-  },
-
-  // Pridá ukážkové záznamy k reálnym dátam, aby zoznamy neboli prázdne pri prezentácii.
-  // Ukážkové záznamy sú označené štítkom „Ukážka".
-  demoFill: true
+  apiBaseUrl: '/api'
 };

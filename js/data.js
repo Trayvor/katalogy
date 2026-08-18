@@ -1,30 +1,9 @@
-// Načítanie dát katalógu — zo snapshotu (JSON) alebo priamo z API podľa konfigurácie
+// Načítanie dát katalógu z API
+
 async function loadCatalog(name) {
-  const cfg = window.KATALOG_CONFIG;
-  let items = [];
-
-  if (cfg.source === 'api') {
-    const headers = {};
-    if (cfg.api.token) headers['Authorization'] = 'Bearer ' + cfg.api.token;
-    const res = await fetch(cfg.api.baseUrl + '/' + name + '/', { headers });
-    if (!res.ok) throw new Error('API error ' + res.status);
-    items = await res.json();
-  } else {
-    const res = await fetch('data/' + name + '.json');
-    if (res.ok) items = await res.json();
-  }
-
-  if (cfg.demoFill) {
-    try {
-      const res = await fetch('data/' + name + '-demo.json');
-      if (res.ok) {
-        const demo = await res.json();
-        items = items.concat(demo.map(function (x) { x._demo = true; return x; }));
-      }
-    } catch (e) { /* ukážkové dáta sú voliteľné */ }
-  }
-
-  return items;
+  const res = await fetch(window.KATALOG_CONFIG.apiBaseUrl + '/' + name + '/');
+  if (!res.ok) throw new Error('API error ' + res.status);
+  return res.json();
 }
 
 // Nájde jeden záznam podľa id (pre detailové stránky)
