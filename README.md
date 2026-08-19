@@ -12,11 +12,15 @@ postavený podľa dizajnového systému [IDSK 3](https://idsk.gov.sk/).
 žiadne `node_modules`. Obsah repozitára = obsah webrootu.
 
 ```
-index.html                  úvodná stránka (rozcestník)
-katalog-ep.html             zoznam edukačných publikácií
-detail-ep.html?id=…         detail publikácie
-katalog-vzdelavania.html    zoznam vzdelávaní
-detail-vzdelavania.html?id=…  detail vzdelávania
+/                        úvodná stránka (rozcestník)
+/katalog-ep              zoznam edukačných publikácií
+/detail-ep?id=…          detail publikácie
+/katalog-vzdelavania     zoznam vzdelávaní
+/detail-vzdelavania?id=…   detail vzdelávania
+
+URL sú „čisté" — bez prípony `.html`. Webserver musí k ceste bez prípony
+skúsiť doplniť `.html` (nginx `try_files $uri $uri.html …`, dev-server to
+robí automaticky).
 idsk/                       IDSK 3 assets (z balíka @id-sk/frontend v3)
 css/site.css                doplnkové štýly
 js/config.js                adresa API
@@ -62,7 +66,7 @@ server {
     index index.html;
 
     location / {
-        try_files $uri $uri/ =404;
+        try_files $uri $uri.html $uri/ =404;
     }
 
     location /api/ {

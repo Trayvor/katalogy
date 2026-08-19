@@ -20,10 +20,10 @@
     <nav class="govuk-breadcrumbs" aria-label="Navigácia">
       <ol class="govuk-breadcrumbs__list">
         <li class="govuk-breadcrumbs__list-item">
-          <a class="govuk-breadcrumbs__link" href="index.html" data-i18n>Úvod</a>
+          <a class="govuk-breadcrumbs__link" href="." data-i18n>Úvod</a>
         </li>
         <li class="govuk-breadcrumbs__list-item">
-          <a class="govuk-breadcrumbs__link" href="katalog-vzdelavania.html" data-i18n>Katalóg vzdelávania v profesijnom rozvoji</a>
+          <a class="govuk-breadcrumbs__link" href="katalog-vzdelavania" data-i18n>Katalóg vzdelávania v profesijnom rozvoji</a>
         </li>
       </ol>
     </nav>
@@ -88,7 +88,7 @@
       renderItem: function (item) {
         return '<article class="app-result">' +
           '<div class="app-result__head">' +
-            '<h3 class="app-result__title"><a class="govuk-link" href="detail-vzdelavania.html?id=' + encodeURIComponent(item.id) + '">' + esc(item.nazov) + '</a></h3>' +
+            '<h3 class="app-result__title"><a class="govuk-link" href="detail-vzdelavania?id=' + encodeURIComponent(item.id) + '">' + esc(item.nazov) + '</a></h3>' +
             (item.hodnotenie != null ? '<span>' + stars(item.hodnotenie, item.pocet_hodnoteni) + '</span>' : '') +
           '</div>' +
           '<p class="govuk-body app-result__desc">' + esc(item.popis || '') + '</p>' +

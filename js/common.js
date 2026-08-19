@@ -23,7 +23,7 @@ function buildHeader() {
   '    </div>' +
   '    <div class="govuk-predheader govuk-width-container">' +
   '      <div class="govuk-header__logo">' +
-  '        <a href="index.html" class="govuk-header__link govuk-header__link--homepage app-logo" title="' + t('Odkaz na titulnú stránku') + '">' +
+  '        <a href="." class="govuk-header__link govuk-header__link--homepage app-logo" title="' + t('Odkaz na titulnú stránku') + '">' +
   '          <img class="app-logo__img" src="img/logo-mssr.svg" alt="' + t('Ministerstvo školstva, výskumu, vývoja a mládeže Slovenskej republiky') + '">' +
   '        </a>' +
   '      </div>' +

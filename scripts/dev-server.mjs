@@ -63,7 +63,9 @@ const server = createServer(async (req, res) => {
   if (path === '/api' || path.startsWith('/api/')) return proxyToApi(req, res);
 
   // normalize + kontrola prefixu bráni úniku mimo ROOT cez ../
-  const rel = normalize(path === '/' ? '/index.html' : path);
+  // "čisté" URL bez prípony: /katalog-ep → katalog-ep.html (ako try_files v nginxe)
+  let rel = normalize(path === '/' ? '/index.html' : path);
+  if (!extname(rel)) rel += '.html';
   const file = join(ROOT, rel);
   if (!file.startsWith(ROOT)) {
     res.writeHead(403).end('Forbidden');
